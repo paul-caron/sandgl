@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SandGL - Sand Simulator</title>
+    <link rel="stylesheet" href="src/stylesheet.css">
+    </style>
+</head>
+<body>
+
+<canvas id="webglCanvas"></canvas>
+
+<script src="src/globals.js"></script>
+<script src="src/classes.js"></script>
+<script src="src/webgl.js"></script>
+
+<script>
+"use strict";
+
+async function start(){
+    try {
+
+        // INITIALIZATION
+        await initWebGL(); 
+        let sand = new Sand();
+        let framebuffer = new Framebuffer();
+
+        // Init framebuffer's texture
+        framebuffer.bind();
+        gl.viewport(0, 0, canvas.width, canvas.height);
+        gl.clear(gl.COLOR_BUFFER_BIT);
+        framebuffer.unbind();
+
+        // THE LOOP
+        function render(time) {
+            framebuffer.bind();//save the frame as texture
+//        gl.clear(gl.COLOR_BUFFER_BIT);
+            sand.draw(framebuffer.texture);
+            framebuffer.unbind();
+            framebuffer.draw();
+            requestAnimationFrame(render);
+        }
+
+        // Start the rendering loop
+        render(0);
+
+    }catch (e) {
+        console.error("PROGRAM EXIT : ", e);
+    }
+}
+
+window.onload = start;
+
+</script>
+</body>
+</html>
