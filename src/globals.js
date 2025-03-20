@@ -3,7 +3,8 @@
 // Globals
 let canvas;
 let gl;
-let program;
+let program={};
+let program2={};
 
 // vertices for the background x,y
 const vertices = new Float32Array([

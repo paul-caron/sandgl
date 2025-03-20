@@ -66,21 +66,21 @@ async function initWebGL(){
     program.textureLocation = gl.getUniformLocation(program, "u_texture");
 
     // Get locations of the attributes and uniforms
-    program2.positionLocation = gl.getAttribLocation(program, "a_position");
-    program2.texCoordLocation = gl.getAttribLocation(program, "a_texCoord");
-    program2.textureLocation = gl.getUniformLocation(program, "u_texture");
+    program2.positionLocation = gl.getAttribLocation(program2, "a_position");
+    program2.texCoordLocation = gl.getAttribLocation(program2, "a_texCoord");
+    program2.textureLocation = gl.getUniformLocation(program2, "u_texture");
+    program2.widthLocation = gl.getUniformLocation(program2, "u_width");
+    program2.heightLocation = gl.getUniformLocation(program2, "u_height");
 
-    // Create buffer and load data
+    // Create buffer
     program.positionBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, program.positionBuffer);
-    gl.vertexAttribPointer(program.positionLocation, 2, gl.FLOAT, false, 4 * 4, 0);
-    gl.enableVertexAttribArray(program.positionLocation);
-    gl.vertexAttribPointer(program.texCoordLocation, 2, gl.FLOAT, false, 4 * 4, 2 * 4);
-    gl.enableVertexAttribArray(program.texCoordLocation);
+
+    // Create buffer
+    program2.positionBuffer = gl.createBuffer();
 
     // WebGL Rendering Settings
     gl.enable(gl.BLEND);
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
-    gl.clearColor(1.0, 0.0, 0.0, 1.0);
+    gl.clearColor(0.0, 0.0, 0.0, 1.0);
 
 }

@@ -4,21 +4,21 @@ class Sand {
     constructor() {
         this.vertices = vertices;
     }
-    draw(texture) {
-
+    draw() {
+        // SELECT PROGRAM
         gl.useProgram(program2);
 
-        // SEND UNIFORMS VARIABLES
-        //gl.uniform1f(program2.widthLocation, canvas.width);
-        //gl.uniform1f(program2.heightLocation, canvas.height);
+        // UNIFORMS VARIABLES
+        gl.uniform1f(program2.widthLocation, canvas.width);
+        gl.uniform1f(program2.heightLocation, canvas.height);
         //gl.uniform1f(program2.timeLocation, this.step);
 
         // PREPARING THE VERTEX BUFFER
-        gl.bindBuffer(gl.ARRAY_BUFFER, program.positionBuffer);
-        gl.vertexAttribPointer(program.positionLocation, 2, gl.FLOAT, false, 4 * 4, 0);
-        gl.enableVertexAttribArray(program.positionLocation);
-        gl.vertexAttribPointer(program.texCoordLocation, 2, gl.FLOAT, false, 4 * 4, 2 * 4);
-        gl.enableVertexAttribArray(program.texCoordLocation);
+        gl.bindBuffer(gl.ARRAY_BUFFER, program2.positionBuffer);
+        gl.vertexAttribPointer(program2.positionLocation, 2, gl.FLOAT, false, 4 * 4, 0);
+        gl.enableVertexAttribArray(program2.positionLocation);
+        gl.vertexAttribPointer(program2.texCoordLocation, 2, gl.FLOAT, false, 4 * 4, 2 * 4);
+        gl.enableVertexAttribArray(program2.texCoordLocation);
 
         // PREPARING THE TEXTURE
         let tex = gl.createTexture();
@@ -34,6 +34,9 @@ class Sand {
         // DRAW
         gl.bufferData(gl.ARRAY_BUFFER, this.vertices, gl.STATIC_DRAW);
         gl.drawArrays(gl.TRIANGLES, 0, 6);
+
+        // DELETE TEXTURE (OTHERWISE THE GPU GETS ITS MEMORY FULL)
+        gl.deleteTexture(tex);
     }
 };
 
