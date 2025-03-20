@@ -4,32 +4,63 @@ uniform sampler2D u_texture;
 uniform float u_width;
 uniform float u_height;
 
+vec4 YELLOW = vec4(1.0,1.0,0.0,1.0);
+vec4 BLACK = vec4(0.0,0.0,0.0,1.0);
+
 
 void main() {
     float dx = 1.0 / u_width;
     float dy = 1.0 / u_height;
 
-    vec2 bl = v_texCoord - vec2(dx, dy); // bottom-left
-    vec2 tr = v_texCoord + vec2(dx, dy); // top-right
-    vec2 br = v_texCoord - vec2(dx,-dy); // bottom-right
-    vec2 tl = v_texCoord + vec2(dx,-dy); // top-left
-    vec2 bc = v_texCoord - vec2(dx, 0.); // bottom-center
-    vec2 tc = v_texCoord + vec2(dx, 0.); // top-center
-    vec2 cl = v_texCoord - vec2(0., dy); // center-left
-    vec2 cr = v_texCoord + vec2(0., dy); // center-right
+    vec4 color = texture2D(u_texture, v_texCoord);
+    vec4 right = texture2D(u_texture, v_texCoord + vec2(dx, 0.0));
+    vec4 left = texture2D(u_texture, v_texCoord + vec2(-dx, 0.0));
 
-    vec4 color = texture2D(u_texture, v_texCoord) +
-                     texture2D(u_texture, bl) +
-                     texture2D(u_texture, tr) +
-                     texture2D(u_texture, br) +
-                     texture2D(u_texture, tl) +
-                     texture2D(u_texture, bc) +
-                     texture2D(u_texture, tc) +
-                     texture2D(u_texture, cl) +
-                     texture2D(u_texture, cr);
-    if(v_texCoord.x >= dx * u_width/2.0 && v_texCoord.x <= dx * u_width/2.0 + dx){
-        color = vec4(1.0,1.0,0.0,1.0);
+    vec4 top = texture2D(u_texture, v_texCoord + vec2(0.0, dy));
+    vec4 topright = texture2D(u_texture, v_texCoord + vec2(dx, dy));
+    vec4 topleft = texture2D(u_texture, v_texCoord + vec2(-dx, dy));
+
+    vec4 bottom = texture2D(u_texture, v_texCoord + vec2(0.0, -dy));
+    vec4 bottomright = texture2D(u_texture, v_texCoord + vec2(dx, -dy));
+    vec4 bottomleft = texture2D(u_texture, v_texCoord + vec2(-dx, -dy));
+
+    int activeNeighbors = int(right.r >= 0.5) +
+                          int(left.r > 0.5) + 
+
+                          int(top.r >= 0.5) +
+                          int(topright.r >= 0.5) +
+                          int(topleft.r > 0.5) +
+
+                          int(bottom.r >= 0.5) +
+                          int(bottomright.r >= 0.5) +
+                          int(bottomleft.r > 0.5);
+
+    if(color.r > 0.5){
+        if(activeNeighbors < 2 || activeNeighbors > 3){
+            color = BLACK;
+        }
+    }else{
+        if(activeNeighbors == 3){
+            color = YELLOW;
+        }
     }
 
+    // sand origin falls in middle top screen
+    if(
+        v_texCoord.y >= (u_height - 1.0) * dy  &&
+        v_texCoord.x <= u_width/5.0 * 4.0 * dx 
+
+        ||
+
+        v_texCoord.y <= 1.0 * dy   &&
+        v_texCoord.x >= u_width/5.0 * dx 
+
+    ){
+        color = YELLOW;
+    }
+
+
+
     gl_FragColor = color;
+
 }
