@@ -1,10 +1,35 @@
 precision highp float;
 varying vec2 v_texCoord;
 uniform sampler2D u_texture;
-uniform sampler2D u_width;
-uniform sampler2D u_height;
+uniform float u_width;
+uniform float u_height;
+
 
 void main() {
-    vec4 tex = texture2D(u_texture, v_texCoord);
-    gl_FragColor = vec4(tex.rg,1.0,1.0);
+    float dx = 1.0 / u_width;
+    float dy = 1.0 / u_height;
+
+    vec2 bl = v_texCoord - vec2(dx, dy); // bottom-left
+    vec2 tr = v_texCoord + vec2(dx, dy); // top-right
+    vec2 br = v_texCoord - vec2(dx,-dy); // bottom-right
+    vec2 tl = v_texCoord + vec2(dx,-dy); // top-left
+    vec2 bc = v_texCoord - vec2(dx, 0.); // bottom-center
+    vec2 tc = v_texCoord + vec2(dx, 0.); // top-center
+    vec2 cl = v_texCoord - vec2(0., dy); // center-left
+    vec2 cr = v_texCoord + vec2(0., dy); // center-right
+
+    vec4 color = texture2D(u_texture, v_texCoord) +
+                     texture2D(u_texture, bl) +
+                     texture2D(u_texture, tr) +
+                     texture2D(u_texture, br) +
+                     texture2D(u_texture, tl) +
+                     texture2D(u_texture, bc) +
+                     texture2D(u_texture, tc) +
+                     texture2D(u_texture, cl) +
+                     texture2D(u_texture, cr);
+    if(v_texCoord.x >= dx * u_width/2.0 && v_texCoord.x <= dx * u_width/2.0 + dx){
+        color = vec4(1.0,1.0,0.0,1.0);
+    }
+
+    gl_FragColor = color;
 }

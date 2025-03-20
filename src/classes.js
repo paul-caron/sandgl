@@ -11,7 +11,6 @@ class Sand {
         // UNIFORMS VARIABLES
         gl.uniform1f(program2.widthLocation, canvas.width);
         gl.uniform1f(program2.heightLocation, canvas.height);
-        //gl.uniform1f(program2.timeLocation, this.step);
 
         // PREPARING THE VERTEX BUFFER
         gl.bindBuffer(gl.ARRAY_BUFFER, program2.positionBuffer);
