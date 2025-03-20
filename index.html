@@ -35,7 +35,7 @@ async function start(){
         // THE LOOP
         function render(time) {
             framebuffer.bind();//save the frame as texture
-            sand.draw(framebuffer.texture);
+            sand.draw();
             framebuffer.unbind();
             framebuffer.draw();
             requestAnimationFrame(render);
