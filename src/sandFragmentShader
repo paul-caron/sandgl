@@ -38,10 +38,10 @@ void main() {
 
         //if no sand present, try fill it
         if(color.r < 0.5){
-            if(cell2Color.r > 0.5){
-                color = cell2Color;
-            }else if(cell3Color.r > 0.5 && cell1Color.r > 0.5){
-                color = cell3Color;
+            if(cell2Color == YELLOW){
+                color = YELLOW;
+            }else if(cell3Color == YELLOW && cell1Color == YELLOW){
+                color = YELLOW;
             }
         }
     }
@@ -59,10 +59,10 @@ void main() {
 
         //if no sand present, try fill it
         if(color.r < 0.5){
-            if(cell3Color.r > 0.5){
-                color = cell3Color;
-            }else if(cell2Color.r > 0.5 && cell0Color.r > 0.5){
-                color = cell2Color;
+            if(cell3Color == YELLOW){
+                color = YELLOW;
+            }else if(cell2Color == YELLOW && cell0Color == YELLOW){
+                color = YELLOW;
             }
         }
     }
@@ -80,9 +80,9 @@ void main() {
 
         //if sand present, try empty it
         if(color.r > 0.5){
-            if(cell0Color.r < 0.5){
+            if(cell0Color == BLACK){
                 color = BLACK;
-            }else if(cell1Color.r < 0.5 && cell0Color.r > 0.5){
+            }else if(cell1Color == BLACK && cell0Color == YELLOW){
                 color = BLACK;
             }
         }
@@ -101,9 +101,9 @@ void main() {
 
         //if sand present, try empty it
         if(color.r > 0.5){
-            if(cell1Color.r < 0.5){
+            if(cell1Color == BLACK){
                 color = BLACK;
-            }else if(cell0Color.r < 0.5 && cell1Color.r > 0.5){
+            }else if(cell0Color == BLACK && cell1Color == YELLOW){
                 color = BLACK;
             }
         }
