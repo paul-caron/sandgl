@@ -4,11 +4,12 @@ uniform sampler2D u_texture;
 uniform float u_width;
 uniform float u_height;
 uniform int u_step;
+uniform vec2 u_spawn;
 
 const vec4 SAND = vec4(1.0,1.0,0.0,1.0);
 const vec4 AIR = vec4(0.0,0.0,0.0,1.0);
-const vec2 SPAWN = vec2(540.0,500.0); // spawning point colX rowY
-const float SCALE = 5.0; // sand grain size
+vec2 SPAWN = u_spawn;//vec2(180.0,360.0); // spawning point colX rowY
+const float SCALE = 4.0; // sand grain size
 
 void main() {
     float dx = SCALE / u_width;   //pixel width
@@ -111,8 +112,8 @@ void main() {
     }
 
     if(
-        celly >= SPAWN.y/SCALE + float(u_step)  && celly < SPAWN.y/SCALE + 1.0 + float(u_step)  &&
-        cellx < SPAWN.x/SCALE + float(u_step) && cellx >=  SPAWN.x/SCALE - 1.0 + float(u_step)
+        celly >= floor(SPAWN.y/SCALE) + float(u_step)  && celly < floor(SPAWN.y/SCALE) + 1.0 + float(u_step)  &&
+        cellx < floor(SPAWN.x/SCALE) + 1.0 + float(u_step) && cellx >=  floor(SPAWN.x/SCALE) + float(u_step)
 
         ||
 

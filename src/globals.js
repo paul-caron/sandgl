@@ -5,6 +5,8 @@ let canvas;
 let gl;
 let program;
 let program2;
+let cursorX;
+let cursorY;
 
 // vertices for the background x,y
 const vertices = new Float32Array([
