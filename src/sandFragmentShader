@@ -10,6 +10,7 @@ uniform int u_element;
 const vec4 SAND = vec4(1.0,1.0,0.0,1.0);
 const vec4 AIR = vec4(0.0,0.0,0.0,1.0);
 const vec4 WATER = vec4(0.0,0.0,1.0,1.0);
+const vec4 WOOD = vec4(0.6,0.4,0.2,1.0);
 
 vec2 SPAWN = u_spawn;//vec2(180.0,360.0); // spawning point colX rowY
 const float SCALE = 4.0; // sand grain size
@@ -45,7 +46,7 @@ void main() {
         if(color == AIR){
             if(cell2Color == SAND){
                 color = SAND;
-            }else if(cell3Color == SAND && cell1Color == SAND){
+            }else if(cell3Color == SAND && cell1Color != AIR){
                 color = SAND;
             }
         }
@@ -66,7 +67,7 @@ void main() {
         if(color == AIR){
             if(cell3Color == SAND){
                 color = SAND;
-            }else if(cell2Color == SAND && cell0Color == SAND){
+            }else if(cell2Color == SAND && cell0Color != AIR){
                 color = SAND;
             }
         }
@@ -130,6 +131,9 @@ if(u_element == 0){
 }
 if(u_element == 1){
     color = AIR;
+}
+if(u_element == 3){
+    color = WOOD;
 }
 }
 
