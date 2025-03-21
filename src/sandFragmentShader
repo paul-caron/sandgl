@@ -5,13 +5,14 @@ uniform float u_width;
 uniform float u_height;
 uniform int u_step;
 
-const vec4 YELLOW = vec4(1.0,1.0,0.0,1.0);
-const vec4 BLACK = vec4(0.0,0.0,0.0,1.0);
-const float scale = 5.0; //default should be 1.0 for small grain sand
+const vec4 SAND = vec4(1.0,1.0,0.0,1.0);
+const vec4 AIR = vec4(0.0,0.0,0.0,1.0);
+const vec2 SPAWN = vec2(540.0,500.0);//spawning point colX rowY
+const float SCALE = 2.0; //default should be 1.0 for small grain sand
 
 void main() {
-    float dx = scale / u_width;   //pixel width
-    float dy = scale / u_height; //pixel height
+    float dx = SCALE / u_width;   //pixel width
+    float dy = SCALE / u_height; //pixel height
 
     vec4 color = texture2D(u_texture, v_texCoord);
     float cellx = v_texCoord.x / dx + float(u_step);
@@ -38,10 +39,10 @@ void main() {
 
         //if no sand present, try fill it
         if(color.r < 0.5){
-            if(cell2Color == YELLOW){
-                color = YELLOW;
-            }else if(cell3Color == YELLOW && cell1Color == YELLOW){
-                color = YELLOW;
+            if(cell2Color == SAND){
+                color = SAND;
+            }else if(cell3Color == SAND && cell1Color == SAND){
+                color = SAND;
             }
         }
     }
@@ -58,11 +59,11 @@ void main() {
             (celly - float(u_step)) * dy));
 
         //if no sand present, try fill it
-        if(color.r < 0.5){
-            if(cell3Color == YELLOW){
-                color = YELLOW;
-            }else if(cell2Color == YELLOW && cell0Color == YELLOW){
-                color = YELLOW;
+        if(color == AIR){
+            if(cell3Color == SAND){
+                color = SAND;
+            }else if(cell2Color == SAND && cell0Color == SAND){
+                color = SAND;
             }
         }
     }
@@ -79,11 +80,11 @@ void main() {
             (celly - 1.0 - float(u_step)) * dy));
 
         //if sand present, try empty it
-        if(color.r > 0.5){
-            if(cell0Color == BLACK){
-                color = BLACK;
-            }else if(cell1Color == BLACK && cell0Color == YELLOW){
-                color = BLACK;
+        if(color == SAND){
+            if(cell0Color == AIR){
+                color = AIR;
+            }else if(cell1Color == AIR && cell0Color == SAND){
+                color = AIR;
             }
         }
     }
@@ -100,25 +101,25 @@ void main() {
             (celly - 1.0 - float(u_step)) * dy));
 
         //if sand present, try empty it
-        if(color.r > 0.5){
-            if(cell1Color == BLACK){
-                color = BLACK;
-            }else if(cell0Color == BLACK && cell1Color == YELLOW){
-                color = BLACK;
+        if(color == SAND){
+            if(cell1Color == AIR){
+                color = AIR;
+            }else if(cell0Color == AIR && cell1Color == SAND){
+                color = AIR;
             }
         }
     }
 
     if(
-        celly >= 70.0 + float(u_step)  && celly < 71.0 + float(u_step)  &&
-        cellx < 150.0 + float(u_step) && cellx >= 149.0 + float(u_step)
+        celly >= SPAWN.y/SCALE + float(u_step)  && celly < SPAWN.y/SCALE+1.0 + float(u_step)  &&
+        cellx < SPAWN.x/SCALE + float(u_step) && cellx >=  SPAWN.x/SCALE - 1.0 + float(u_step)
 
         ||
 
         celly < 1.0  + float(u_step) //floor
 
     ){
-        color = YELLOW;
+        color = SAND;
     }
 
     gl_FragColor = color;
