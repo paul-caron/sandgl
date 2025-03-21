@@ -87,7 +87,7 @@ void main() {
         if(color == SAND){
             if(cell0Color == AIR){
                 color = AIR;
-            }else if(cell1Color == AIR && cell0Color == SAND){
+            }else if(cell1Color == AIR && cell3Color != SAND){
                 color = AIR;
             }
         }
@@ -108,7 +108,7 @@ void main() {
         if(color == SAND){
             if(cell1Color == AIR){
                 color = AIR;
-            }else if(cell0Color == AIR && cell1Color == SAND){
+            }else if(cell0Color == AIR && cell2Color != SAND){
                 color = AIR;
             }
         }
