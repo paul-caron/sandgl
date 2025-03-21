@@ -38,7 +38,7 @@ void main() {
             (celly - float(u_step)) * dy));
 
         //if no sand present, try fill it
-        if(color.r < 0.5){
+        if(color == AIR){
             if(cell2Color == SAND){
                 color = SAND;
             }else if(cell3Color == SAND && cell1Color == SAND){
