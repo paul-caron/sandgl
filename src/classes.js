@@ -3,6 +3,7 @@
 class Sand {
     constructor() {
         this.vertices = vertices;
+        this.step = 0;
     }
     draw() {
         // SELECT PROGRAM
@@ -11,6 +12,9 @@ class Sand {
         // UNIFORMS VARIABLES
         gl.uniform1f(program2.widthLocation, canvas.width);
         gl.uniform1f(program2.heightLocation, canvas.height);
+        gl.uniform1i(program2.stepLocation, this.step++);
+
+        this.step %= 2;
 
         // PREPARING THE VERTEX BUFFER
         gl.bindBuffer(gl.ARRAY_BUFFER, program2.positionBuffer);

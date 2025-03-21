@@ -3,63 +3,123 @@ varying vec2 v_texCoord;
 uniform sampler2D u_texture;
 uniform float u_width;
 uniform float u_height;
+uniform int u_step;
 
-vec4 YELLOW = vec4(1.0,1.0,0.0,1.0);
-vec4 BLACK = vec4(0.0,0.0,0.0,1.0);
-
+const vec4 YELLOW = vec4(1.0,1.0,0.0,1.0);
+const vec4 BLACK = vec4(0.0,0.0,0.0,1.0);
+const float scale = 5.0; //default should be 1.0 for small grain sand
 
 void main() {
-    float dx = 1.0 / u_width;
-    float dy = 1.0 / u_height;
+    float dx = scale / u_width;   //pixel width
+    float dy = scale / u_height; //pixel height
 
     vec4 color = texture2D(u_texture, v_texCoord);
-    vec4 right = texture2D(u_texture, v_texCoord + vec2(dx, 0.0));
-    vec4 left = texture2D(u_texture, v_texCoord + vec2(-dx, 0.0));
+    float cellx = v_texCoord.x / dx + float(u_step);
+    float celly = v_texCoord.y / dy + float(u_step);
+    float blockx = cellx / 2.0;
+    float blocky = celly / 2.0;
 
-    vec4 top = texture2D(u_texture, v_texCoord + vec2(0.0, dy));
-    vec4 topright = texture2D(u_texture, v_texCoord + vec2(dx, dy));
-    vec4 topleft = texture2D(u_texture, v_texCoord + vec2(-dx, dy));
+    // find cell position within the 2x2 block : |2,3|
+    //                                           |0,1|
 
-    vec4 bottom = texture2D(u_texture, v_texCoord + vec2(0.0, -dy));
-    vec4 bottomright = texture2D(u_texture, v_texCoord + vec2(dx, -dy));
-    vec4 bottomleft = texture2D(u_texture, v_texCoord + vec2(-dx, -dy));
+    int cellPosition = 0;
 
-    int activeNeighbors = int(right.r >= 0.5) +
-                          int(left.r > 0.5) + 
+    if(mod(cellx, 2.0) < 1.0 && mod(celly, 2.0) < 1.0){
+        cellPosition = 0;
+        vec4 cell2Color = texture2D(u_texture, vec2(
+            (cellx - float(u_step)) * dx, 
+            (celly + 1.0 - float(u_step)) * dy));
+        vec4 cell3Color = texture2D(u_texture, vec2(
+            (cellx + 1.0 - float(u_step)) * dx, 
+            (celly + 1.0 - float(u_step)) * dy));
+        vec4 cell1Color = texture2D(u_texture, vec2(
+            (cellx + 1.0 - float(u_step)) * dx, 
+            (celly - float(u_step)) * dy));
 
-                          int(top.r >= 0.5) +
-                          int(topright.r >= 0.5) +
-                          int(topleft.r > 0.5) +
-
-                          int(bottom.r >= 0.5) +
-                          int(bottomright.r >= 0.5) +
-                          int(bottomleft.r > 0.5);
-
-    if(color.r > 0.5){
-        if(activeNeighbors < 2 || activeNeighbors > 3){
-            color = BLACK;
+        //if no sand present, try fill it
+        if(color.r < 0.5){
+            if(cell2Color.r > 0.5){
+                color = cell2Color;
+            }else if(cell3Color.r > 0.5 && cell1Color.r > 0.5){
+                color = cell3Color;
+            }
         }
-    }else{
-        if(activeNeighbors == 3){
-            color = YELLOW;
+    }
+    else if(mod(cellx, 2.0) >= 1.0 && mod(celly, 2.0) < 1.0){
+        cellPosition = 1;
+        vec4 cell2Color = texture2D(u_texture, vec2(
+            (cellx - 1.0 - float(u_step)) * dx, 
+            (celly + 1.0 - float(u_step)) * dy));
+        vec4 cell3Color = texture2D(u_texture, vec2(
+            (cellx - float(u_step)) * dx, 
+            (celly + 1.0 - float(u_step)) * dy));
+        vec4 cell0Color = texture2D(u_texture, vec2(
+            (cellx - 1.0 - float(u_step)) * dx, 
+            (celly - float(u_step)) * dy));
+
+        //if no sand present, try fill it
+        if(color.r < 0.5){
+            if(cell3Color.r > 0.5){
+                color = cell3Color;
+            }else if(cell2Color.r > 0.5 && cell0Color.r > 0.5){
+                color = cell2Color;
+            }
+        }
+    }
+    else if(mod(cellx, 2.0) < 1.0 && mod(celly, 2.0) >= 1.0){
+        cellPosition = 2;
+        vec4 cell1Color = texture2D(u_texture, vec2(
+            (cellx + 1.0 - float(u_step)) * dx, 
+            (celly - 1.0 - float(u_step)) * dy));
+        vec4 cell3Color = texture2D(u_texture, vec2(
+            (cellx + 1.0 - float(u_step)) * dx, 
+            (celly - float(u_step)) * dy));
+        vec4 cell0Color = texture2D(u_texture, vec2(
+            (cellx - float(u_step)) * dx, 
+            (celly - 1.0 - float(u_step)) * dy));
+
+        //if sand present, try empty it
+        if(color.r > 0.5){
+            if(cell0Color.r < 0.5){
+                color = BLACK;
+            }else if(cell1Color.r < 0.5 && cell0Color.r > 0.5){
+                color = BLACK;
+            }
+        }
+    }
+    else if(mod(cellx, 2.0) >= 1.0 && mod(celly, 2.0) >= 1.0){
+        cellPosition = 3;
+        vec4 cell1Color = texture2D(u_texture, vec2(
+            (cellx - float(u_step)) * dx, 
+            (celly - 1.0 - float(u_step)) * dy));
+        vec4 cell2Color = texture2D(u_texture, vec2(
+            (cellx - 1.0 - float(u_step)) * dx, 
+            (celly - float(u_step)) * dy));
+        vec4 cell0Color = texture2D(u_texture, vec2(
+            (cellx - 1.0 - float(u_step)) * dx, 
+            (celly - 1.0 - float(u_step)) * dy));
+
+        //if sand present, try empty it
+        if(color.r > 0.5){
+            if(cell1Color.r < 0.5){
+                color = BLACK;
+            }else if(cell0Color.r < 0.5 && cell1Color.r > 0.5){
+                color = BLACK;
+            }
         }
     }
 
-    // sand origin falls in middle top screen
     if(
-        v_texCoord.y >= (u_height - 1.0) * dy  &&
-        v_texCoord.x <= u_width/5.0 * 4.0 * dx 
+        celly >= 70.0 + float(u_step)  && celly < 71.0 + float(u_step)  &&
+        cellx < 150.0 + float(u_step) && cellx >= 149.0 + float(u_step)
 
         ||
 
-        v_texCoord.y <= 1.0 * dy   &&
-        v_texCoord.x >= u_width/5.0 * dx 
+        celly < 1.0  + float(u_step) //floor
 
     ){
         color = YELLOW;
     }
-
-
 
     gl_FragColor = color;
 

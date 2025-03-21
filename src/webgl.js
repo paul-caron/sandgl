@@ -71,6 +71,7 @@ async function initWebGL(){
     program2.textureLocation = gl.getUniformLocation(program2, "u_texture");
     program2.widthLocation = gl.getUniformLocation(program2, "u_width");
     program2.heightLocation = gl.getUniformLocation(program2, "u_height");
+    program2.stepLocation = gl.getUniformLocation(program2, "u_step");
 
     // Create buffer
     program.positionBuffer = gl.createBuffer();
