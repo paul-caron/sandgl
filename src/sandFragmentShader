@@ -57,8 +57,23 @@ void initSandRules(){
     sandRules[8] = Rule(State(SAND,AIR,SAND,AIR),State(SAND,SAND,AIR,AIR));
 }
 
+Rule waterRules[9];
+
+void initWaterRules(){
+    waterRules[0] = Rule(State(AIR,AIR,WATER,AIR),State(WATER,AIR,AIR,AIR));
+    waterRules[1] = Rule(State(AIR,AIR,AIR,WATER),State(AIR,WATER,AIR,AIR));
+    waterRules[2] = Rule(State(AIR,AIR,WATER,WATER),State(WATER,WATER,AIR,AIR));
+    waterRules[3] = Rule(State(AIR,WATER,WATER,WATER),State(WATER,WATER,AIR,WATER));
+    waterRules[4] = Rule(State(WATER,AIR,WATER,WATER),State(WATER,WATER,WATER,AIR));
+    waterRules[5] = Rule(State(WATER,AIR,AIR,WATER),State(WATER,WATER,AIR,AIR));
+    waterRules[6] = Rule(State(AIR,WATER,WATER,AIR),State(WATER,WATER,AIR,AIR));
+    waterRules[7] = Rule(State(AIR,WATER,AIR,WATER),State(WATER,WATER,AIR,AIR));
+    waterRules[8] = Rule(State(WATER,AIR,WATER,AIR),State(WATER,WATER,AIR,AIR));
+}
+
 void main() {
     initSandRules();
+    initWaterRules();
 
     dx = SCALE / u_width;   //pixel width
     dy = SCALE / u_height; //pixel height
@@ -111,8 +126,20 @@ void main() {
     State currentState = State(cell0Color,cell1Color,cell2Color,cell3Color);
     State nextState = currentState;
 
+    // CHECK SAND RULES
     for(int i = 0;i < 9; i++){
         Rule rule = sandRules[i];
+        State from = rule.from;
+        State to = rule.to;
+        if(currentState == from){
+            nextState = to;
+            break;
+        }
+    }
+
+    // CHECK WATER RULES
+    for(int i = 0;i < 9; i++){
+        Rule rule = waterRules[i];
         State from = rule.from;
         State to = rule.to;
         if(currentState == from){
