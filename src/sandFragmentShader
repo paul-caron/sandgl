@@ -10,20 +10,40 @@ uniform int u_element;
 const vec4 SAND = vec4(1.0,1.0,0.0,1.0);
 const vec4 AIR = vec4(0.0,0.0,0.0,1.0);
 const vec4 WATER = vec4(0.0,0.0,1.0,1.0);
+const vec4 WATERL = vec4(0.1,0.1,1.0,1.0);
+const vec4 WATERR = vec4(0.0,0.0,0.8,1.0);
 const vec4 WOOD = vec4(0.6,0.4,0.2,1.0);
 
-vec2 SPAWN = u_spawn;//vec2(180.0,360.0); // spawning point colX rowY
+
 const float SCALE = 4.0; // sand grain size
 
-void main() {
-    float dx = SCALE / u_width;   //pixel width
-    float dy = SCALE / u_height; //pixel height
 
-    vec4 color = texture2D(u_texture, v_texCoord);
-    float cellx = v_texCoord.x / dx + float(u_step);
-    float celly = v_texCoord.y / dy + float(u_step);
+float dx;
+float dy;
+float cellx;
+float celly;
+
+
+vec4 getCellColor(float offsetX, float offsetY) {
+    return texture2D(u_texture, vec2(
+        (cellx + offsetX - float(u_step)) * dx,
+        (celly + offsetY - float(u_step)) * dy
+    ));
+}
+
+
+
+void main() {
+
+    dx = SCALE / u_width;   //pixel width
+    dy = SCALE / u_height; //pixel height
+    cellx = v_texCoord.x / dx + float(u_step);
+    celly = v_texCoord.y / dy + float(u_step);
     float blockx = cellx / 2.0;
     float blocky = celly / 2.0;
+
+
+    vec4 color = texture2D(u_texture, v_texCoord);
 
     // find cell position within the 2x2 block : |2,3|
     //                                           |0,1|
@@ -32,119 +52,129 @@ void main() {
 
     if(mod(cellx, 2.0) < 1.0 && mod(celly, 2.0) < 1.0){
         cellPosition = 0;
-        vec4 cell2Color = texture2D(u_texture, vec2(
-            (cellx - float(u_step)) * dx, 
-            (celly + 1.0 - float(u_step)) * dy));
-        vec4 cell3Color = texture2D(u_texture, vec2(
-            (cellx + 1.0 - float(u_step)) * dx, 
-            (celly + 1.0 - float(u_step)) * dy));
-        vec4 cell1Color = texture2D(u_texture, vec2(
-            (cellx + 1.0 - float(u_step)) * dx, 
-            (celly - float(u_step)) * dy));
+        vec4 cell2Color = getCellColor(0.0,1.0);
+        vec4 cell3Color = getCellColor(1.0,1.0);
+        vec4 cell1Color = getCellColor(1.0,0.0);
 
         //if no sand present, try fill it
         if(color == AIR){
+            if(cell2Color == SAND || cell2Color == WATER || cell2Color == WATERR){
+                color = cell2Color;
+            }else if(cell3Color == SAND && cell1Color != AIR && cell1Color != WATER){
+                color = SAND;
+            }else if(cell2Color == AIR && cell3Color == WATER && cell1Color == WATER){
+                color = WATERL;
+            }
+        }else if(color == WATER){
             if(cell2Color == SAND){
                 color = SAND;
-            }else if(cell3Color == SAND && cell1Color != AIR){
-                color = SAND;
+            }else if(cell2Color == WATER && cell3Color == AIR && cell1Color == AIR){
+                color = AIR;
+            }
+        }else if(color == WATERR){
+            if(cell1Color == AIR){
+                color = AIR;
             }
         }
     }
     else if(mod(cellx, 2.0) >= 1.0 && mod(celly, 2.0) < 1.0){
         cellPosition = 1;
-        vec4 cell2Color = texture2D(u_texture, vec2(
-            (cellx - 1.0 - float(u_step)) * dx, 
-            (celly + 1.0 - float(u_step)) * dy));
-        vec4 cell3Color = texture2D(u_texture, vec2(
-            (cellx - float(u_step)) * dx, 
-            (celly + 1.0 - float(u_step)) * dy));
-        vec4 cell0Color = texture2D(u_texture, vec2(
-            (cellx - 1.0 - float(u_step)) * dx, 
-            (celly - float(u_step)) * dy));
+        vec4 cell2Color = getCellColor(-1.0,1.0);
+        vec4 cell3Color = getCellColor(0.0,1.0);
+        vec4 cell0Color = getCellColor(-1.0,0.0);
 
         //if no sand present, try fill it
         if(color == AIR){
+            if(cell3Color == SAND || cell3Color == WATER || cell3Color == WATERL){
+                color = cell3Color;
+            }else if(cell2Color == SAND && cell0Color != AIR && cell0Color != WATER){
+                color = SAND;
+            }else if(cell3Color == AIR && cell2Color == WATER && cell0Color == WATER){
+                color = WATERR;
+            }
+        }else if(color == WATER){
             if(cell3Color == SAND){
                 color = SAND;
-            }else if(cell2Color == SAND && cell0Color != AIR){
-                color = SAND;
+            }else if(cell3Color == WATER && cell2Color == AIR && cell0Color == AIR){
+                color = AIR;	
+            }
+        }else if(color == WATERL){
+            if(cell0Color == AIR){
+                color = AIR;
             }
         }
     }
     else if(mod(cellx, 2.0) < 1.0 && mod(celly, 2.0) >= 1.0){
         cellPosition = 2;
-        vec4 cell1Color = texture2D(u_texture, vec2(
-            (cellx + 1.0 - float(u_step)) * dx, 
-            (celly - 1.0 - float(u_step)) * dy));
-        vec4 cell3Color = texture2D(u_texture, vec2(
-            (cellx + 1.0 - float(u_step)) * dx, 
-            (celly - float(u_step)) * dy));
-        vec4 cell0Color = texture2D(u_texture, vec2(
-            (cellx - float(u_step)) * dx, 
-            (celly - 1.0 - float(u_step)) * dy));
+        vec4 cell1Color = getCellColor(1.0,-1.0);
+        vec4 cell3Color = getCellColor(1.0,0.0);
+        vec4 cell0Color = getCellColor(0.0,-1.0);
 
         //if sand present, try empty it
         if(color == SAND){
-            if(cell0Color == AIR){
-                color = AIR;
+            if(cell0Color == AIR || cell0Color == WATER){
+                color = cell0Color;
             }else if(cell1Color == AIR && cell3Color != SAND){
                 color = AIR;
             }
+        }else if(color == WATER){
+            if(cell0Color == AIR){
+                color = AIR;
+            }
+        }else if(color == WATERR){
+            if(cell3Color == AIR){
+                color = AIR;
+            }
         }
+
     }
     else if(mod(cellx, 2.0) >= 1.0 && mod(celly, 2.0) >= 1.0){
         cellPosition = 3;
-        vec4 cell1Color = texture2D(u_texture, vec2(
-            (cellx - float(u_step)) * dx, 
-            (celly - 1.0 - float(u_step)) * dy));
-        vec4 cell2Color = texture2D(u_texture, vec2(
-            (cellx - 1.0 - float(u_step)) * dx, 
-            (celly - float(u_step)) * dy));
-        vec4 cell0Color = texture2D(u_texture, vec2(
-            (cellx - 1.0 - float(u_step)) * dx, 
-            (celly - 1.0 - float(u_step)) * dy));
+        vec4 cell1Color = getCellColor(0.0,-1.0);
+        vec4 cell2Color = getCellColor(-1.0,0.0);
+        vec4 cell0Color = getCellColor(-1.0,-1.0);
 
         //if sand present, try empty it
         if(color == SAND){
+            if(cell1Color == AIR || cell1Color == WATER){
+                color = cell1Color;
+            }else if(cell0Color == AIR && cell2Color != SAND){
+                color = AIR;
+            }
+        }else if(color == WATER){
             if(cell1Color == AIR){
                 color = AIR;
-            }else if(cell0Color == AIR && cell2Color != SAND){
+            }
+        }else if(color == WATERL){
+            if(cell2Color == AIR){
                 color = AIR;
             }
         }
     }
 
 
-
-
-
-
-if(
-        celly >= floor(SPAWN.y/SCALE) + float(u_step)  && celly < floor(SPAWN.y/SCALE) + 1.0 + float(u_step)  &&
-        cellx < floor(SPAWN.x/SCALE) + 1.0 + float(u_step) && cellx >=  floor(SPAWN.x/SCALE) + float(u_step)
-
-)
-{
-if(u_element == 0){
-    color = SAND;
-}
-if(u_element == 1){
-    color = AIR;
-}
-if(u_element == 2){
-    color = WATER;
-}
-if(u_element == 3){
-    color = WOOD;
-}
-}
-
+    // SPAWNING ELEMENT
     if(
+        celly >= floor(u_spawn.y/SCALE) + float(u_step)  && celly < floor(u_spawn.y/SCALE) + 1.0 + float(u_step)  &&
+        cellx < floor(u_spawn.x/SCALE) + 1.0 + float(u_step) && cellx >=  floor(u_spawn.x/SCALE) + float(u_step)
+    )
+    {
+        if(u_element == 0){
+            color = SAND;
+        }
+        if(u_element == 1){
+            color = AIR;
+        }
+        if(u_element == 2){
+            color = WATER;
+        }
+        if(u_element == 3){
+            color = WOOD;
+        }
+    }
 
-        celly < 1.0
-
-    ){
+    // DRAWING SAND FLOOR
+    if( celly < 1.0){
         color = SAND;
     }
 
