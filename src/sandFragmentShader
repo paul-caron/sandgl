@@ -132,6 +132,9 @@ if(u_element == 0){
 if(u_element == 1){
     color = AIR;
 }
+if(u_element == 2){
+    color = WATER;
+}
 if(u_element == 3){
     color = WOOD;
 }
