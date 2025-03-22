@@ -7,7 +7,7 @@ let program;
 let program2;
 let cursorX;
 let cursorY;
-let element = 0; // 0 for sand
+let element = -1; // -1 , no element to print
 
 // vertices for the background x,y
 const vertices = new Float32Array([
