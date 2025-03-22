@@ -43,10 +43,22 @@ struct Rule{
     State to;
 };
 
-Rule sandRules[1];
-//sandRules[0] = Rule(State(AIR,AIR,SAND,AIR),State(SAND,AIR,AIR,AIR));
+Rule sandRules[9];
+
+void initSandRules(){
+    sandRules[0] = Rule(State(AIR,AIR,SAND,AIR),State(SAND,AIR,AIR,AIR));
+    sandRules[1] = Rule(State(AIR,AIR,AIR,SAND),State(AIR,SAND,AIR,AIR));
+    sandRules[2] = Rule(State(AIR,AIR,SAND,SAND),State(SAND,SAND,AIR,AIR));
+    sandRules[3] = Rule(State(AIR,SAND,SAND,SAND),State(SAND,SAND,AIR,SAND));
+    sandRules[4] = Rule(State(SAND,AIR,SAND,SAND),State(SAND,SAND,SAND,AIR));
+    sandRules[5] = Rule(State(SAND,AIR,AIR,SAND),State(SAND,SAND,AIR,AIR));
+    sandRules[6] = Rule(State(AIR,SAND,SAND,AIR),State(SAND,SAND,AIR,AIR));
+    sandRules[7] = Rule(State(AIR,SAND,AIR,SAND),State(SAND,SAND,AIR,AIR));
+    sandRules[8] = Rule(State(SAND,AIR,SAND,AIR),State(SAND,SAND,AIR,AIR));
+}
 
 void main() {
+    initSandRules();
 
     dx = SCALE / u_width;   //pixel width
     dy = SCALE / u_height; //pixel height
