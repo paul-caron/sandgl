@@ -31,7 +31,20 @@ vec4 getCellColor(float offsetX, float offsetY) {
     ));
 }
 
+struct State{
+    vec4 cell0Color;
+    vec4 cell1Color;
+    vec4 cell2Color;
+    vec4 cell3Color;
+};
 
+struct Rule{
+    State from;
+    State to;
+};
+
+Rule sandRules[1];
+//sandRules[0] = Rule(State(AIR,AIR,SAND,AIR),State(SAND,AIR,AIR,AIR));
 
 void main() {
 
