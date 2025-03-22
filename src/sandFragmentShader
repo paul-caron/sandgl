@@ -74,109 +74,57 @@ void main() {
     //                                           |0,1|
 
     int cellPosition = 0;
+    vec4 cell0Color;
+    vec4 cell1Color;
+    vec4 cell2Color;
+    vec4 cell3Color;
 
     if(mod(cellx, 2.0) < 1.0 && mod(celly, 2.0) < 1.0){
         cellPosition = 0;
-        vec4 cell2Color = getCellColor(0.0,1.0);
-        vec4 cell3Color = getCellColor(1.0,1.0);
-        vec4 cell1Color = getCellColor(1.0,0.0);
-
-        //if no sand present, try fill it
-        if(color == AIR){
-            if(cell2Color == SAND || cell2Color == WATER || cell2Color == WATERR){
-                color = cell2Color;
-            }else if(cell3Color == SAND && cell1Color != AIR && cell1Color != WATER){
-                color = SAND;
-            }else if(cell2Color == AIR && cell3Color == WATER && cell1Color == WATER){
-                color = WATERL;
-            }
-        }else if(color == WATER){
-            if(cell2Color == SAND){
-                color = SAND;
-            }else if(cell2Color == WATER && cell3Color == AIR && cell1Color == AIR){
-                color = AIR;
-            }
-        }else if(color == WATERR){
-            if(cell1Color == AIR){
-                color = AIR;
-            }
-        }
+        cell0Color = color;
+        cell1Color = getCellColor(1.0,0.0);
+        cell2Color = getCellColor(0.0,1.0);
+        cell3Color = getCellColor(1.0,1.0);
     }
     else if(mod(cellx, 2.0) >= 1.0 && mod(celly, 2.0) < 1.0){
         cellPosition = 1;
-        vec4 cell2Color = getCellColor(-1.0,1.0);
-        vec4 cell3Color = getCellColor(0.0,1.0);
-        vec4 cell0Color = getCellColor(-1.0,0.0);
-
-        //if no sand present, try fill it
-        if(color == AIR){
-            if(cell3Color == SAND || cell3Color == WATER || cell3Color == WATERL){
-                color = cell3Color;
-            }else if(cell2Color == SAND && cell0Color != AIR && cell0Color != WATER){
-                color = SAND;
-            }else if(cell3Color == AIR && cell2Color == WATER && cell0Color == WATER){
-                color = WATERR;
-            }
-        }else if(color == WATER){
-            if(cell3Color == SAND){
-                color = SAND;
-            }else if(cell3Color == WATER && cell2Color == AIR && cell0Color == AIR){
-                color = AIR;	
-            }
-        }else if(color == WATERL){
-            if(cell0Color == AIR){
-                color = AIR;
-            }
-        }
+        cell0Color = getCellColor(-1.0,0.0);
+        cell1Color = color;
+        cell2Color = getCellColor(-1.0,1.0);
+        cell3Color = getCellColor(0.0,1.0);
     }
     else if(mod(cellx, 2.0) < 1.0 && mod(celly, 2.0) >= 1.0){
         cellPosition = 2;
-        vec4 cell1Color = getCellColor(1.0,-1.0);
-        vec4 cell3Color = getCellColor(1.0,0.0);
-        vec4 cell0Color = getCellColor(0.0,-1.0);
-
-        //if sand present, try empty it
-        if(color == SAND){
-            if(cell0Color == AIR || cell0Color == WATER){
-                color = cell0Color;
-            }else if(cell1Color == AIR && cell3Color != SAND){
-                color = AIR;
-            }
-        }else if(color == WATER){
-            if(cell0Color == AIR){
-                color = AIR;
-            }
-        }else if(color == WATERR){
-            if(cell3Color == AIR){
-                color = AIR;
-            }
-        }
-
+        cell0Color = getCellColor(0.0,-1.0);
+        cell1Color = getCellColor(1.0,-1.0);
+        cell2Color = color;
+        cell3Color = getCellColor(1.0,0.0);
     }
     else if(mod(cellx, 2.0) >= 1.0 && mod(celly, 2.0) >= 1.0){
         cellPosition = 3;
-        vec4 cell1Color = getCellColor(0.0,-1.0);
-        vec4 cell2Color = getCellColor(-1.0,0.0);
-        vec4 cell0Color = getCellColor(-1.0,-1.0);
+        cell0Color = getCellColor(-1.0,-1.0);
+        cell1Color = getCellColor(0.0,-1.0);
+        cell2Color = getCellColor(-1.0,0.0);
+        cell3Color = color;
+    }
 
-        //if sand present, try empty it
-        if(color == SAND){
-            if(cell1Color == AIR || cell1Color == WATER){
-                color = cell1Color;
-            }else if(cell0Color == AIR && cell2Color != SAND){
-                color = AIR;
-            }
-        }else if(color == WATER){
-            if(cell1Color == AIR){
-                color = AIR;
-            }
-        }else if(color == WATERL){
-            if(cell2Color == AIR){
-                color = AIR;
-            }
+    State currentState = State(cell0Color,cell1Color,cell2Color,cell3Color);
+    State nextState = currentState;
+
+    for(int i = 0;i < 9; i++){
+        Rule rule = sandRules[i];
+        State from = rule.from;
+        State to = rule.to;
+        if(currentState == from){
+            nextState = to;
+            break;
         }
     }
 
+    if(cellPosition == 0){ color = nextState.cell0Color;}
+    if(cellPosition == 1){ color = nextState.cell1Color;}
+    if(cellPosition == 2){ color = nextState.cell2Color;}
+    if(cellPosition == 3){ color = nextState.cell3Color;}
 
     // SPAWNING ELEMENT
     if(
