@@ -17,7 +17,9 @@ const vec4 WOOD = vec4(0.6,0.4,0.2,1.0);
 const int SOLID_STATIC = 0; //NOT MOVING
 const int SOLID = 1;
 const int LIQUID = 2;
+const int SOLID_LIQUID = 3;
 const int GAS = 4;
+const int LIQUID_GAS = 6;
 
 
 int getStateOfMatter(vec4 color){
@@ -29,6 +31,28 @@ int getStateOfMatter(vec4 color){
         return GAS;
     }
     return SOLID_STATIC;
+}
+
+bool compareStateOfMatter(int a, int b){
+    if(a == LIQUID){
+      if(b == LIQUID || b == LIQUID_GAS){
+          return true;
+      }
+      return false;
+    }
+    if(a == SOLID){
+      if(b == SOLID || b == SOLID_LIQUID){
+          return true;
+      }
+      return false;
+    }
+    if(a == GAS){
+      if(b == GAS || b == LIQUID_GAS){
+          return true;
+      }
+      return false;
+    }
+    return false;
 }
 
 const float SCALE = 4.0; // sand grain size
@@ -67,15 +91,15 @@ struct Rule{
 Rule sandRules[9];
 
 void initSandRules(){
-    sandRules[0] = Rule(State(GAS,GAS,SOLID,GAS),Permutation(2,1,0,3));
-    sandRules[1] = Rule(State(GAS,GAS,GAS,SOLID),Permutation(0,3,2,1));
-    sandRules[2] = Rule(State(GAS,GAS,SOLID,SOLID),Permutation(2,3,0,1));
-    sandRules[3] = Rule(State(GAS,SOLID,SOLID,SOLID),Permutation(2,1,0,3));
-    sandRules[4] = Rule(State(SOLID,GAS,SOLID,SOLID),Permutation(0,3,2,1));
-    sandRules[5] = Rule(State(SOLID,GAS,GAS,SOLID),Permutation(0,3,2,1));
-    sandRules[6] = Rule(State(GAS,SOLID,SOLID,GAS),Permutation(2,1,0,3));
-    sandRules[7] = Rule(State(GAS,SOLID,GAS,SOLID),Permutation(3,1,2,0));
-    sandRules[8] = Rule(State(SOLID,GAS,SOLID,GAS),Permutation(0,2,1,3));
+    sandRules[0] = Rule(State(LIQUID_GAS,LIQUID_GAS,SOLID,LIQUID_GAS),Permutation(2,1,0,3));
+    sandRules[1] = Rule(State(LIQUID_GAS,LIQUID_GAS,LIQUID_GAS,SOLID),Permutation(0,3,2,1));
+    sandRules[2] = Rule(State(LIQUID_GAS,LIQUID_GAS,SOLID,SOLID),Permutation(2,3,0,1));
+    sandRules[3] = Rule(State(LIQUID_GAS,SOLID,SOLID,SOLID),Permutation(2,1,0,3));
+    sandRules[4] = Rule(State(SOLID,LIQUID_GAS,SOLID,SOLID),Permutation(0,3,2,1));
+    sandRules[5] = Rule(State(SOLID,LIQUID_GAS,LIQUID_GAS,SOLID),Permutation(0,3,2,1));
+    sandRules[6] = Rule(State(LIQUID_GAS,SOLID,SOLID,LIQUID_GAS),Permutation(2,1,0,3));
+    sandRules[7] = Rule(State(LIQUID_GAS,SOLID,LIQUID_GAS,SOLID),Permutation(3,1,2,0));
+    sandRules[8] = Rule(State(SOLID,LIQUID_GAS,SOLID,LIQUID_GAS),Permutation(0,2,1,3));
 }
 
 Rule waterRules[9];
@@ -157,7 +181,12 @@ void main() {
     for(int i = 0;i < 9; i++){
         Rule rule = sandRules[i];
         State state = rule.state;
-        if(currentState == state){
+        if(
+            compareStateOfMatter(currentState.cell0State, state.cell0State) &&
+            compareStateOfMatter(currentState.cell1State, state.cell1State) &&
+            compareStateOfMatter(currentState.cell2State, state.cell2State) &&
+            compareStateOfMatter(currentState.cell3State, state.cell3State) 
+        ){
             permutation = rule.p;
             break;
         }
@@ -167,7 +196,12 @@ void main() {
     for(int i = 0;i < 9; i++){
         Rule rule = waterRules[i];
         State state = rule.state;
-        if(currentState == state){
+        if(
+            compareStateOfMatter(currentState.cell0State, state.cell0State) &&
+            compareStateOfMatter(currentState.cell1State, state.cell1State) &&
+            compareStateOfMatter(currentState.cell2State, state.cell2State) &&
+            compareStateOfMatter(currentState.cell3State, state.cell3State) 
+        ){
             permutation = rule.p;
             break;
         }
