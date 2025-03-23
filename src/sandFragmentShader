@@ -134,13 +134,14 @@ void initWaterRules(){
     waterRules[8] = Rule(State(LIQUID,GAS,LIQUID,GAS),Permutation(0,2,1,3));
 }
 
-Rule waterDirectionalRules[5];
+Rule waterDirectionalRules[6];
 void initWaterDirectionalRules(){
-    waterDirectionalRules[0] = Rule(State(LIQUID_RIGHT,LIQUID_GAS,GAS,GAS),Permutation(1,0,2,3));
-    waterDirectionalRules[1] = Rule(State(LIQUID_GAS,LIQUID_LEFT,LIQUID_GAS,LIQUID_GAS),Permutation(1,0,2,3));
-    waterDirectionalRules[2] = Rule(State(SOLID_LIQUID,SOLID_LIQUID,LIQUID_RIGHT,LIQUID_GAS),Permutation(0,1,3,2));
-    waterDirectionalRules[3] = Rule(State(SOLID_LIQUID,SOLID_LIQUID,LIQUID_GAS,LIQUID_LEFT),Permutation(0,1,3,2));
-    waterDirectionalRules[4] = Rule(State(LIQUID_LEFT,LIQUID_LEFT,LIQUID_GAS,LIQUID_LEFT),Permutation(0,1,3,2));
+    waterDirectionalRules[4] = Rule(State(LIQUID_RIGHT,LIQUID_GAS,GAS,GAS),Permutation(1,0,2,3));
+    waterDirectionalRules[5] = Rule(State(LIQUID_GAS,LIQUID_LEFT,LIQUID_GAS,LIQUID_GAS),Permutation(1,0,2,3));
+    waterDirectionalRules[2] = Rule(State(SOLID_LIQUID,SOLID_LIQUID,LIQUID_RIGHT,GAS),Permutation(0,1,3,2));
+    waterDirectionalRules[3] = Rule(State(SOLID_LIQUID,SOLID_LIQUID,GAS,LIQUID_LEFT),Permutation(0,1,3,2));
+    waterDirectionalRules[1] = Rule(State(SOLID_LIQUID,SOLID_LIQUID,LIQUID_RIGHT,LIQUID_LEFT),Permutation(0,1,3,2));
+    waterDirectionalRules[0] = Rule(State(LIQUID_RIGHT,LIQUID_LEFT,SOLID_LIQUID,SOLID_LIQUID),Permutation(1,0,2,3));
 //    waterDirectionalRules[4] = Rule(State(LIQUID_LEFT,LIQUID_RIGHT,LIQUID_GAS,LIQUID_GAS),Permutation(3,2,1,0));
 }
 
@@ -249,7 +250,7 @@ void main() {
 
     // CHECK WATER RULES DIRECTIONAL
     if(!ruleFound){
-    for(int i = 0;i < 5; i++){
+    for(int i = 0;i < 6; i++){
         Rule rule = waterDirectionalRules[i];
         State state = rule.state;
         if(
@@ -290,6 +291,11 @@ void main() {
     }
 
 //    if(ruleFound){color = vec4(1.,1.,1.,1.);}
+    if(!ruleFound){
+        if(color == WATERL){color = WATERR;}
+        else if(color == WATERR){color = WATERL;}
+    }
+
 
     // SPAWNING ELEMENT
     if(
