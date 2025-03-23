@@ -5,6 +5,9 @@ class Sand {
         this.vertices = vertices;
         this.step = 0;
     }
+    stepReset(){
+        this.step %= 2;
+    }
     draw() {
         // SELECT PROGRAM
         gl.useProgram(program2);
@@ -16,7 +19,7 @@ class Sand {
         gl.uniform2fv(program2.spawnLocation, new Float32Array([Math.floor(cursorX),Math.floor(canvas.height-cursorY)]));
         gl.uniform1i(program2.elementLocation, element);
 
-        this.step %= 2;
+        this.stepReset();
 
         // PREPARING THE VERTEX BUFFER
         gl.bindBuffer(gl.ARRAY_BUFFER, program2.positionBuffer);
