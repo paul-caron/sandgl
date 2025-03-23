@@ -14,15 +14,29 @@ const vec4 WATERL = vec4(0.1,0.1,1.0,1.0);
 const vec4 WATERR = vec4(0.0,0.0,0.8,1.0);
 const vec4 WOOD = vec4(0.6,0.4,0.2,1.0);
 
+const int SOLID_STATIC = 0; //NOT MOVING
+const int SOLID = 1;
+const int LIQUID = 2;
+const int GAS = 4;
+
+
+int getStateOfMatter(vec4 color){
+    if(color == WATER || color == WATERL || color == WATERR){
+        return LIQUID;
+    }else if (color == SAND){
+        return SOLID;
+    }else if (color == AIR){
+        return GAS;
+    }
+    return SOLID_STATIC;
+}
 
 const float SCALE = 4.0; // sand grain size
-
 
 float dx;
 float dy;
 float cellx;
 float celly;
-
 
 vec4 getCellColor(float offsetX, float offsetY) {
     return texture2D(u_texture, vec2(
@@ -32,43 +46,50 @@ vec4 getCellColor(float offsetX, float offsetY) {
 }
 
 struct State{
-    vec4 cell0Color;
-    vec4 cell1Color;
-    vec4 cell2Color;
-    vec4 cell3Color;
+    int cell0State;
+    int cell1State;
+    int cell2State;
+    int cell3State;
+};
+
+struct Permutation{
+    int cell0;
+    int cell1;
+    int cell2;
+    int cell3;
 };
 
 struct Rule{
-    State from;
-    State to;
+    State state;
+    Permutation p;
 };
 
 Rule sandRules[9];
 
 void initSandRules(){
-    sandRules[0] = Rule(State(AIR,AIR,SAND,AIR),State(SAND,AIR,AIR,AIR));
-    sandRules[1] = Rule(State(AIR,AIR,AIR,SAND),State(AIR,SAND,AIR,AIR));
-    sandRules[2] = Rule(State(AIR,AIR,SAND,SAND),State(SAND,SAND,AIR,AIR));
-    sandRules[3] = Rule(State(AIR,SAND,SAND,SAND),State(SAND,SAND,AIR,SAND));
-    sandRules[4] = Rule(State(SAND,AIR,SAND,SAND),State(SAND,SAND,SAND,AIR));
-    sandRules[5] = Rule(State(SAND,AIR,AIR,SAND),State(SAND,SAND,AIR,AIR));
-    sandRules[6] = Rule(State(AIR,SAND,SAND,AIR),State(SAND,SAND,AIR,AIR));
-    sandRules[7] = Rule(State(AIR,SAND,AIR,SAND),State(SAND,SAND,AIR,AIR));
-    sandRules[8] = Rule(State(SAND,AIR,SAND,AIR),State(SAND,SAND,AIR,AIR));
+    sandRules[0] = Rule(State(GAS,GAS,SOLID,GAS),Permutation(2,1,0,3));
+    sandRules[1] = Rule(State(GAS,GAS,GAS,SOLID),Permutation(0,3,2,1));
+    sandRules[2] = Rule(State(GAS,GAS,SOLID,SOLID),Permutation(2,3,0,1));
+    sandRules[3] = Rule(State(GAS,SOLID,SOLID,SOLID),Permutation(2,1,0,3));
+    sandRules[4] = Rule(State(SOLID,GAS,SOLID,SOLID),Permutation(0,3,2,1));
+    sandRules[5] = Rule(State(SOLID,GAS,GAS,SOLID),Permutation(0,3,2,1));
+    sandRules[6] = Rule(State(GAS,SOLID,SOLID,GAS),Permutation(2,1,0,3));
+    sandRules[7] = Rule(State(GAS,SOLID,GAS,SOLID),Permutation(3,1,2,0));
+    sandRules[8] = Rule(State(SOLID,GAS,SOLID,GAS),Permutation(0,2,1,3));
 }
 
 Rule waterRules[9];
 
 void initWaterRules(){
-    waterRules[0] = Rule(State(AIR,AIR,WATER,AIR),State(WATER,AIR,AIR,AIR));
-    waterRules[1] = Rule(State(AIR,AIR,AIR,WATER),State(AIR,WATER,AIR,AIR));
-    waterRules[2] = Rule(State(AIR,AIR,WATER,WATER),State(WATER,WATER,AIR,AIR));
-    waterRules[3] = Rule(State(AIR,WATER,WATER,WATER),State(WATER,WATER,AIR,WATER));
-    waterRules[4] = Rule(State(WATER,AIR,WATER,WATER),State(WATER,WATER,WATER,AIR));
-    waterRules[5] = Rule(State(WATER,AIR,AIR,WATER),State(WATER,WATER,AIR,AIR));
-    waterRules[6] = Rule(State(AIR,WATER,WATER,AIR),State(WATER,WATER,AIR,AIR));
-    waterRules[7] = Rule(State(AIR,WATER,AIR,WATER),State(WATER,WATER,AIR,AIR));
-    waterRules[8] = Rule(State(WATER,AIR,WATER,AIR),State(WATER,WATER,AIR,AIR));
+    waterRules[0] = Rule(State(GAS,GAS,LIQUID,GAS),Permutation(2,1,0,3));
+    waterRules[1] = Rule(State(GAS,GAS,GAS,LIQUID),Permutation(0,3,2,1));
+    waterRules[2] = Rule(State(GAS,GAS,LIQUID,LIQUID),Permutation(2,3,0,1));
+    waterRules[3] = Rule(State(GAS,LIQUID,LIQUID,LIQUID),Permutation(2,1,0,3));
+    waterRules[4] = Rule(State(LIQUID,GAS,LIQUID,LIQUID),Permutation(0,3,2,1));
+    waterRules[5] = Rule(State(LIQUID,GAS,GAS,LIQUID),Permutation(0,3,2,1));
+    waterRules[6] = Rule(State(GAS,LIQUID,LIQUID,GAS),Permutation(2,1,0,3));
+    waterRules[7] = Rule(State(GAS,LIQUID,GAS,LIQUID),Permutation(3,1,2,0));
+    waterRules[8] = Rule(State(LIQUID,GAS,LIQUID,GAS),Permutation(0,2,1,3));
 }
 
 void main() {
@@ -123,16 +144,21 @@ void main() {
         cell3Color = color;
     }
 
-    State currentState = State(cell0Color,cell1Color,cell2Color,cell3Color);
-    State nextState = currentState;
+    State currentState = State(
+        getStateOfMatter(cell0Color),
+        getStateOfMatter(cell1Color),
+        getStateOfMatter(cell2Color),
+        getStateOfMatter(cell3Color)
+    );
+
+    Permutation permutation = Permutation(0,1,2,3);
 
     // CHECK SAND RULES
     for(int i = 0;i < 9; i++){
         Rule rule = sandRules[i];
-        State from = rule.from;
-        State to = rule.to;
-        if(currentState == from){
-            nextState = to;
+        State state = rule.state;
+        if(currentState == state){
+            permutation = rule.p;
             break;
         }
     }
@@ -140,18 +166,38 @@ void main() {
     // CHECK WATER RULES
     for(int i = 0;i < 9; i++){
         Rule rule = waterRules[i];
-        State from = rule.from;
-        State to = rule.to;
-        if(currentState == from){
-            nextState = to;
+        State state = rule.state;
+        if(currentState == state){
+            permutation = rule.p;
             break;
         }
     }
 
-    if(cellPosition == 0){ color = nextState.cell0Color;}
-    if(cellPosition == 1){ color = nextState.cell1Color;}
-    if(cellPosition == 2){ color = nextState.cell2Color;}
-    if(cellPosition == 3){ color = nextState.cell3Color;}
+
+    if(cellPosition == 0){
+        if(permutation.cell0 == 0){color = cell0Color;};
+        if(permutation.cell0 == 1){color = cell1Color;};
+        if(permutation.cell0 == 2){color = cell2Color;};
+        if(permutation.cell0 == 3){color = cell3Color;};
+    }
+    if(cellPosition == 1){
+        if(permutation.cell1 == 0){color = cell0Color;};
+        if(permutation.cell1 == 1){color = cell1Color;};
+        if(permutation.cell1 == 2){color = cell2Color;};
+        if(permutation.cell1 == 3){color = cell3Color;};
+    }
+    if(cellPosition == 2){ 
+        if(permutation.cell2 == 0){color = cell0Color;};
+        if(permutation.cell2 == 1){color = cell1Color;};
+        if(permutation.cell2 == 2){color = cell2Color;};
+        if(permutation.cell2 == 3){color = cell3Color;};
+    }
+    if(cellPosition == 3){
+        if(permutation.cell3 == 0){color = cell0Color;};
+        if(permutation.cell3 == 1){color = cell1Color;};
+        if(permutation.cell3 == 2){color = cell2Color;};
+        if(permutation.cell3 == 3){color = cell3Color;};
+    }
 
     // SPAWNING ELEMENT
     if(
