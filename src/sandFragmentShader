@@ -7,11 +7,11 @@ uniform int u_step;
 uniform vec2 u_spawn;
 uniform int u_element;
 
-const vec4 SAND = vec4(1.0,1.0,0.0,1.0);
+const vec4 SAND = vec4(1.0,0.8,0.1,1.0);
 const vec4 AIR = vec4(0.0,0.0,0.0,1.0);
-const vec4 WATER = vec4(0.0,1.0,1.0,1.0);
-const vec4 WATERL = vec4(0.4,0.4,1.0,1.0);
-const vec4 WATERR = vec4(0.0,0.0,0.8,1.0);
+const vec4 WATER = vec4(0.0,0.0,1.0,1.0);
+const vec4 WATERL = vec4(0.0,0.1,1.0,1.0);
+const vec4 WATERR = vec4(0.0,0.1,0.8,1.0);
 const vec4 WOOD = vec4(0.6,0.4,0.2,1.0);
 
 const int SOLID_STATIC = 0; //NOT MOVING
@@ -23,16 +23,25 @@ const int LIQUID_GAS = 6;
 const int LIQUID_RIGHT = 10;
 const int LIQUID_LEFT = 11;
 
+bvec4 equalEnough(vec4 a, vec4 b){
+    return bvec4(
+        abs(a.r-b.r) < 0.01,
+        abs(a.g-b.g) < 0.01,
+        abs(a.b-b.b) < 0.01,
+        abs(a.a-b.a) < 0.01        
+    );
+}
+
 int getStateOfMatter(vec4 color){
-    if(color == WATER){
+    if(all(equalEnough(color, WATER))){
         return LIQUID;
-    }else if (color == WATERL){
+    }else if (all(equalEnough(color, WATERL))){
         return LIQUID_LEFT;
-    }else if(color == WATERR){
+    }else if(all(equalEnough(color, WATERR))){
         return LIQUID_RIGHT;
-    }else if (color == SAND){
+    }else if (all(equalEnough(color, SAND))){
         return SOLID;
-    }else if (color == AIR){
+    }else if (all(equalEnough(color, AIR))){
         return GAS;
     }
     return SOLID_STATIC;
@@ -134,7 +143,7 @@ void initWaterRules(){
     waterRules[8] = Rule(State(LIQUID,GAS,LIQUID,GAS),Permutation(0,2,1,3));
 }
 
-Rule waterDirectionalRules[6];
+Rule waterDirectionalRules[7];
 void initWaterDirectionalRules(){
     waterDirectionalRules[4] = Rule(State(LIQUID_RIGHT,LIQUID_GAS,GAS,GAS),Permutation(1,0,2,3));
     waterDirectionalRules[5] = Rule(State(LIQUID_GAS,LIQUID_LEFT,LIQUID_GAS,LIQUID_GAS),Permutation(1,0,2,3));
@@ -142,7 +151,7 @@ void initWaterDirectionalRules(){
     waterDirectionalRules[3] = Rule(State(SOLID_LIQUID,SOLID_LIQUID,GAS,LIQUID_LEFT),Permutation(0,1,3,2));
     waterDirectionalRules[1] = Rule(State(SOLID_LIQUID,SOLID_LIQUID,LIQUID_RIGHT,LIQUID_LEFT),Permutation(0,1,3,2));
     waterDirectionalRules[0] = Rule(State(LIQUID_RIGHT,LIQUID_LEFT,SOLID_LIQUID,SOLID_LIQUID),Permutation(1,0,2,3));
-//    waterDirectionalRules[4] = Rule(State(LIQUID_LEFT,LIQUID_RIGHT,LIQUID_GAS,LIQUID_GAS),Permutation(3,2,1,0));
+    waterDirectionalRules[6] = Rule(State(LIQUID_LEFT,LIQUID_RIGHT,LIQUID_GAS,LIQUID_GAS),Permutation(3,2,1,0));
 }
 
 void main() {
@@ -292,8 +301,8 @@ void main() {
 
 //    if(ruleFound){color = vec4(1.,1.,1.,1.);}
     if(!ruleFound){
-        if(color == WATERL){color = WATERR;}
-        else if(color == WATERR){color = WATERL;}
+        if(all(equalEnough(color, WATERL))){color = WATERR;}
+        else if(all(equalEnough(color, WATERR))){color = WATERL;}
     }
 
 
