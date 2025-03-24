@@ -16,10 +16,10 @@
       <option value="2">Water</option>
       <option value="3">Wood</option>
     </select>
+    <button type="button" id="save">save</button>
+    <input type="file" id="inputFile"></input>
   </form>
 <canvas id="webglCanvas"></canvas>
-<script src="https://cdn.jsdelivr.net/npm/eruda"></script>
-<script>eruda.init();</script>
 <script src="src/globals.js"></script>
 <script src="src/classes.js"></script>
 <script src="src/webgl.js"></script>
@@ -49,7 +49,18 @@ async function start(){
             sand.draw();
             framebuffer.unbind();
             framebuffer.draw();
-//            setTimeout(render, 1000);
+
+            if(capture){
+                capture = false;
+                let dataURL = canvas.toDataURL('image/png');
+                let url = dataURL.replace(/^data:image\/png/,'data:application/octet-stream');
+                downloadLink.setAttribute('href', url);
+                downloadLink.click();
+            }
+            if(imageLoaded){
+                imageLoaded = false;
+                framebuffer.loadImg();
+            }
             requestAnimationFrame(render);
         }
 

@@ -92,5 +92,17 @@ class Framebuffer {
         gl.bufferData(gl.ARRAY_BUFFER, this.vertices, gl.STATIC_DRAW);
         gl.drawArrays(gl.TRIANGLES, 0, 6);
     }
+    loadImg(){ // load image that contains a game saved state
+        gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true); //png images are loaded Y axis inverted by default
+        gl.bindTexture(gl.TEXTURE_2D, this.framebuffer.texture);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+        canvas.width = img.width;
+        canvas.height = img.height;
+        gl.viewport(0, 0, canvas.width, canvas.height);
+    }
 };
 

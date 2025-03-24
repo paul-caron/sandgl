@@ -2,6 +2,28 @@ function initEvents(){
 
     let mousedown = false;
 
+    let saveButton = document.querySelector("#save");
+    saveButton.addEventListener('click', (e)=>{
+        e.preventDefault();
+        capture = true;
+    });
+
+
+    let reader = new FileReader();
+    reader.onload = function(e) {
+        img.src = e.target.result;
+        img.onload = function() {
+            imageLoaded = true;
+        };
+    };
+
+    let inputFile = document.querySelector("#inputFile");
+    inputFile.addEventListener('change', (e)=>{
+        e.preventDefault();
+        let file = e.target.files[0];
+        reader.readAsDataURL(file);
+    });
+
     canvas.addEventListener('mousedown',
         (event) => {
             event.preventDefault();
