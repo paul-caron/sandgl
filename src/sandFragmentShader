@@ -6,6 +6,7 @@ uniform float u_height;
 uniform int u_step;
 uniform vec2 u_spawn;
 uniform int u_element;
+uniform int u_crayonSize;
 
 const vec4 SAND = vec4(1.0,0.8,0.1,1.0);
 const vec4 AIR = vec4(0.0,0.0,0.0,1.0);
@@ -304,11 +305,11 @@ void main() {
         else if(all(equalEnough(color, WATERR))){color = WATERL;}
     }
 
-
+    float crayonSize = float(u_crayonSize);
     // SPAWNING ELEMENT
     if(
-        celly >= floor(u_spawn.y/SCALE) + float(stepy)  && celly < floor(u_spawn.y/SCALE) + 1.0 + float(stepy)  &&
-        cellx < floor(u_spawn.x/SCALE) + 1.0 + float(stepx) && cellx >=  floor(u_spawn.x/SCALE) + float(stepx)
+        celly >= floor(u_spawn.y/SCALE) + float(stepy)  && celly < floor(u_spawn.y/SCALE) + crayonSize + float(stepy)  &&
+        cellx < floor(u_spawn.x/SCALE) + crayonSize + float(stepx) && cellx >=  floor(u_spawn.x/SCALE) + float(stepx)
     )
     {
         if(u_element == 0){

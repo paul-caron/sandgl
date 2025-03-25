@@ -24,6 +24,12 @@ function initEvents(){
         reader.readAsDataURL(file);
     });
 
+    let cs = document.querySelector("#crayonSize");
+    cs.addEventListener('change', (e) => {
+        e.preventDefault();
+        crayonSize = cs.value;
+    });
+
     canvas.addEventListener('mousedown',
         (event) => {
             event.preventDefault();

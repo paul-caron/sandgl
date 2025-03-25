@@ -18,6 +18,7 @@ class Sand {
         gl.uniform1i(program2.stepLocation, this.step++);
         gl.uniform2fv(program2.spawnLocation, new Float32Array([Math.floor(cursorX),Math.floor(canvas.height-cursorY)]));
         gl.uniform1i(program2.elementLocation, element);
+        gl.uniform1i(program2.crayonSizeLocation, crayonSize);
 
         this.stepReset();
 

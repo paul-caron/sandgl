@@ -74,6 +74,7 @@ async function initWebGL(){
     program2.stepLocation = gl.getUniformLocation(program2, "u_step");
     program2.spawnLocation = gl.getUniformLocation(program2, "u_spawn");
     program2.elementLocation = gl.getUniformLocation(program2, "u_element");
+    program2.crayonSizeLocation = gl.getUniformLocation(program2, "u_crayonSize");
 
     // Create buffer
     program.positionBuffer = gl.createBuffer();
