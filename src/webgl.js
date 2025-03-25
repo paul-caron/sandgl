@@ -2,8 +2,8 @@ async function initWebGL(){
 
     canvas = document.getElementById('webglCanvas',{preserveDrawingBuffer: true});
     gl = canvas.getContext('webgl');
-    let width = window.innerWidth;
-    let height = window.innerHeight;
+    let width = window.innerWidth/scale;
+    let height = window.innerHeight/scale;
     canvas.width = width;
     canvas.height = height;
 

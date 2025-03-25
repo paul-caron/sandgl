@@ -1,5 +1,12 @@
 function initEvents(){
 
+
+    let form = document.querySelector("form");
+    form.addEventListener("submit", (e)=>{
+        e.preventDefault();
+    });
+
+
     let mousedown = false;
 
     let saveButton = document.querySelector("#save");
@@ -34,8 +41,8 @@ function initEvents(){
         (event) => {
             event.preventDefault();
             mousedown = true;
-            cursorX = event.clientX;
-            cursorY = event.clientY;
+            cursorX = event.clientX/scale;
+            cursorY = event.clientY/scale;
             element = parseInt(document.querySelector('select').value);
         }
     );
@@ -44,8 +51,8 @@ function initEvents(){
         (event) => {
             event.preventDefault();
             if(mousedown){
-                cursorX = event.clientX;
-                cursorY = event.clientY;
+                cursorX = event.clientX/scale;
+                cursorY = event.clientY/scale;
             }
         }
     );
@@ -62,8 +69,8 @@ function initEvents(){
         (event) => {
             event.preventDefault();
             let touch = event.touches[0];
-            cursorX = touch.clientX;
-            cursorY = touch.clientY;
+            cursorX = touch.clientX/scale;
+            cursorY = touch.clientY/scale;
             element = parseInt(document.querySelector('select').value);
         }
     );
@@ -80,8 +87,8 @@ function initEvents(){
         (event) => {
             event.preventDefault();
             let touch = event.touches[0];
-            cursorX = touch.clientX;
-            cursorY = touch.clientY;
+            cursorX = touch.clientX/scale;
+            cursorY = touch.clientY/scale;
         }
     );
 

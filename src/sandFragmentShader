@@ -86,7 +86,7 @@ bool compareStateOfMatter(int a, int b){
 //y = 0,1,0,-1 //sin
 int stepx;
 int stepy;
-const float SCALE = 4.0; // sand grain size
+const float SCALE = 1.0; // sand grain size
 
 float dx;
 float dy;

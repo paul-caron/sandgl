@@ -39,8 +39,9 @@ async function start(){
         // INITIALIZATION
         await initWebGL();
         initEvents(); 
-        let sand = new Sand();
         let framebuffer = new Framebuffer();
+        framebuffer2 = new Framebuffer();
+        let sand = new Sand();
 
         // Init framebuffer's texture
         framebuffer.bind();
@@ -48,13 +49,20 @@ async function start(){
         gl.clear(gl.COLOR_BUFFER_BIT);
         framebuffer.unbind();
 
+        framebuffer2.bind();
+        gl.viewport(0, 0, canvas.width, canvas.height);
+        gl.clear(gl.COLOR_BUFFER_BIT);
+        framebuffer2.unbind();
+
         // THE LOOP
         function render(time) {
             framebuffer.bind();//save the frame as texture
             sand.draw();
             framebuffer.unbind();
+            framebuffer2.bind()
             framebuffer.draw();
-
+            framebuffer2.unbind();
+            framebuffer.draw();
             if(capture){
                 capture = false;
                 let dataURL = canvas.toDataURL('image/png');
@@ -65,6 +73,7 @@ async function start(){
             if(imageLoaded){
                 imageLoaded = false;
                 framebuffer.loadImg();
+                framebuffer2.loadImg();
             }
             requestAnimationFrame(render);
         }

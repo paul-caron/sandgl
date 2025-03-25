@@ -9,12 +9,16 @@ let cursorX;
 let cursorY;
 let element = -1; // -1 , no element to print
 let crayonSize = 1;
+let scale = 10;
 
 let downloadLink = document.createElement('a');
 downloadLink.setAttribute('download', 'Image.png');
 let capture = false;
 let imageLoaded = false ;
 let img = new Image();
+
+
+let framebuffer2;
 
 // vertices for the background x,y
 const vertices = new Float32Array([
