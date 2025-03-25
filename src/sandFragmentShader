@@ -299,7 +299,6 @@ void main() {
         if(permutation.cell3 == 3){color = cell3Color;};
     }
 
-//    if(ruleFound){color = vec4(1.,1.,1.,1.);}
     if(!ruleFound){
         if(all(equalEnough(color, WATERL))){color = WATERR;}
         else if(all(equalEnough(color, WATERR))){color = WATERL;}
