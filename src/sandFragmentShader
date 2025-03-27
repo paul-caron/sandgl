@@ -21,6 +21,7 @@ const int SOLID = 1;
 const int LIQUID = 2;
 const int SOLID_LIQUID = 3;
 const int GAS = 4;
+const int GAS_MOVING = 8;
 const int LIQUID_GAS = 6;
 const int LIQUID_RIGHT = 10;
 const int LIQUID_LEFT = 11;
@@ -46,7 +47,7 @@ int getStateOfMatter(vec4 color){
     }else if (all(equalEnough(color, AIR))){
         return GAS;
     }else if (all(equalEnough(color, MIST))){
-        return GAS;
+        return GAS_MOVING;
     }
     return SOLID_STATIC;
 }
@@ -73,8 +74,13 @@ bool compareStateOfMatter(int a, int b){
           return true;
       }
     }
-    if(a == GAS){
+    if(a == GAS || a == GAS_MOVING){
       if(b == GAS || b == LIQUID_GAS){
+          return true;
+      }
+    }
+    if(a == GAS_MOVING){
+      if(b == GAS_MOVING){
           return true;
       }
     }
@@ -158,6 +164,62 @@ void initWaterDirectionalRules(){
     waterDirectionalRules[6] = Rule(State(LIQUID_LEFT,LIQUID_RIGHT,LIQUID_GAS,LIQUID_GAS),Permutation(3,2,1,0));
 }
 
+Rule mistRulesClockwise[19];
+Rule mistRulesCounterClockwise[19];
+void initMistRulesClockwise(){
+    //no moving if directions oppose (see HPP gas / TM gas)
+    mistRulesClockwise[0] = Rule(State(GAS_MOVING,GAS,GAS,GAS_MOVING),Permutation(0,1,2,3));
+    mistRulesClockwise[1] = Rule(State(GAS,GAS_MOVING,GAS_MOVING,GAS),Permutation(0,1,2,3));
+    //hit wall
+//    mistRulesClockwise[2] = Rule(State(SOLID_LIQUID,SOLID_LIQUID,GAS,GAS),Permutation(0,1,2,3));
+//    mistRulesClockwise[3] = Rule(State(SOLID_LIQUID,GAS,SOLID_LIQUID,GAS),Permutation(0,1,2,3));
+//    mistRulesClockwise[4] = Rule(State(GAS,GAS,SOLID_LIQUID,SOLID_LIQUID),Permutation(0,1,2,3));
+//    mistRulesClockwise[5] = Rule(State(GAS,SOLID_LIQUID,GAS,SOLID_LIQUID),Permutation(0,1,2,3));
+//    mistRulesClockwise[6] = Rule(State(SOLID_LIQUID,GAS,GAS,GAS),Permutation(0,1,2,3));
+//    mistRulesClockwise[7] = Rule(State(GAS,SOLID_LIQUID,GAS,GAS),Permutation(0,1,2,3));
+//    mistRulesClockwise[8] = Rule(State(GAS,GAS,SOLID_LIQUID,GAS),Permutation(0,1,2,3));
+//    mistRulesClockwise[9] = Rule(State(GAS,GAS,GAS,SOLID_LIQUID),Permutation(0,1,2,3));
+ 
+//    mistRulesClockwise[10] = Rule(State(SOLID_STATIC,SOLID_STATIC,GAS,GAS),Permutation(0,1,2,3));
+//    mistRulesClockwise[11] = Rule(State(SOLID_STATIC,GAS,SOLID_STATIC,GAS),Permutation(0,1,2,3));
+//    mistRulesClockwise[12] = Rule(State(GAS,GAS,SOLID_STATIC,SOLID_STATIC),Permutation(0,1,2,3));
+//    mistRulesClockwise[13] = Rule(State(GAS,SOLID_STATIC,GAS,SOLID_STATIC),Permutation(0,1,2,3));
+//    mistRulesClockwise[14] = Rule(State(SOLID_STATIC,GAS,GAS,GAS),Permutation(0,1,2,3));
+//    mistRulesClockwise[15] = Rule(State(GAS,SOLID_STATIC,GAS,GAS),Permutation(0,1,2,3));
+//    mistRulesClockwise[16] = Rule(State(GAS,GAS,SOLID_STATIC,GAS),Permutation(0,1,2,3));
+//    mistRulesClockwise[17] = Rule(State(GAS,GAS,GAS,SOLID_STATIC),Permutation(0,1,2,3));
+    
+    // else, permutate clockwise;
+    mistRulesClockwise[2] = Rule(State(GAS,GAS,GAS,GAS),Permutation(1,3,0,2));
+}
+void initMistRulesCounterClockwise(){
+    //no moving if directions oppose (see HPP gas / TM gas)
+    mistRulesCounterClockwise[0] = Rule(State(GAS_MOVING,GAS,GAS,GAS_MOVING),Permutation(0,1,2,3));
+    mistRulesCounterClockwise[1] = Rule(State(GAS,GAS_MOVING,GAS_MOVING,GAS),Permutation(0,1,2,3));
+    //hit wall
+//    mistRulesClockwise[2] = Rule(State(SOLID_LIQUID,SOLID_LIQUID,GAS,GAS),Permutation(0,1,2,3));
+//    mistRulesClockwise[3] = Rule(State(SOLID_LIQUID,GAS,SOLID_LIQUID,GAS),Permutation(0,1,2,3));
+//    mistRulesClockwise[4] = Rule(State(GAS,GAS,SOLID_LIQUID,SOLID_LIQUID),Permutation(0,1,2,3));
+//    mistRulesClockwise[5] = Rule(State(GAS,SOLID_LIQUID,GAS,SOLID_LIQUID),Permutation(0,1,2,3));
+//    mistRulesClockwise[6] = Rule(State(SOLID_LIQUID,GAS,GAS,GAS),Permutation(0,1,2,3));
+//    mistRulesClockwise[7] = Rule(State(GAS,SOLID_LIQUID,GAS,GAS),Permutation(0,1,2,3));
+//    mistRulesClockwise[8] = Rule(State(GAS,GAS,SOLID_LIQUID,GAS),Permutation(0,1,2,3));
+//    mistRulesClockwise[9] = Rule(State(GAS,GAS,GAS,SOLID_LIQUID),Permutation(0,1,2,3));
+
+//    mistRulesClockwise[10] = Rule(State(SOLID_STATIC,SOLID_STATIC,GAS,GAS),Permutation(0,1,2,3));
+//    mistRulesClockwise[11] = Rule(State(SOLID_STATIC,GAS,SOLID_STATIC,GAS),Permutation(0,1,2,3));
+//    mistRulesClockwise[12] = Rule(State(GAS,GAS,SOLID_STATIC,SOLID_STATIC),Permutation(0,1,2,3));
+//    mistRulesClockwise[13] = Rule(State(GAS,SOLID_STATIC,GAS,SOLID_STATIC),Permutation(0,1,2,3));
+//    mistRulesClockwise[14] = Rule(State(SOLID_STATIC,GAS,GAS,GAS),Permutation(0,1,2,3));
+//    mistRulesClockwise[15] = Rule(State(GAS,SOLID_STATIC,GAS,GAS),Permutation(0,1,2,3));
+//    mistRulesClockwise[16] = Rule(State(GAS,GAS,SOLID_STATIC,GAS),Permutation(0,1,2,3));
+//    mistRulesClockwise[17] = Rule(State(GAS,GAS,GAS,SOLID_STATIC),Permutation(0,1,2,3));
+
+    // else, permutate counter clockwise;
+    mistRulesCounterClockwise[2] = Rule(State(GAS,GAS,GAS,GAS),Permutation(2,0,3,1));
+}
+
+
 void main() {
 ///////////////////////////////////////////
     stepx = u_step; 
@@ -166,6 +228,8 @@ void main() {
     initSandRules();
     initWaterRules();
     initWaterDirectionalRules();
+    initMistRulesClockwise();
+    initMistRulesCounterClockwise();
 
     dx = SCALE / u_width; //pixel width
     dy = SCALE / u_height; //pixel height
@@ -278,6 +342,27 @@ void main() {
         }
     }}
 
+    // CHECK MIST RULES
+    if(!ruleFound){
+    for(int i = 0;i < 3; i++){
+        Rule rule;
+        if(u_step==0) rule = mistRulesClockwise[i];
+        if(u_step==1) rule = mistRulesCounterClockwise[i];
+        State state = rule.state;
+        if(
+            compareStateOfMatter(currentState.cell0State, state.cell0State) &&
+            compareStateOfMatter(currentState.cell1State, state.cell1State) &&
+            compareStateOfMatter(currentState.cell2State, state.cell2State) &&
+            compareStateOfMatter(currentState.cell3State, state.cell3State) 
+        ){
+            ruleFound = true;
+            permutation = rule.p;
+            break;
+        }
+    }
+    }
+    
+
     if(cellPosition == 0){
         if(permutation.cell0 == 0){color = cell0Color;};
         if(permutation.cell0 == 1){color = cell1Color;};
@@ -303,10 +388,16 @@ void main() {
         if(permutation.cell3 == 3){color = cell3Color;};
     }
 
+
+   
+
+
     if(!ruleFound){
-        if(all(equalEnough(color, WATERL))){color = WATERR;}
+        if(all(equalEnough(color, WATERL))){color = WATERR;ruleFound = true;}
         else if(all(equalEnough(color, WATERR))){color = WATERL;}
     }
+
+
 
     float crayonSize = float(u_crayonSize);
     // SPAWNING ELEMENT
