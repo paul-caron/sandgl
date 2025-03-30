@@ -30,26 +30,12 @@ class Sand {
         gl.vertexAttribPointer(program2.texCoordLocation, 2, gl.FLOAT, false, 4 * 4, 2 * 4);
         gl.enableVertexAttribArray(program2.texCoordLocation);
 
-        // PREPARING THE TEXTURE
-/*        if(!this.texture){
-        this.texture = gl.createTexture();
-        gl.bindTexture(gl.TEXTURE_2D, this.texture);
-        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, canvas.width, canvas.height, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-        }*/
         gl.bindTexture(gl.TEXTURE_2D, framebuffer2.framebuffer.texture);
-        // copy texture from current binded framebuffer into current binded texture
-//        gl.copyTexImage2D(gl.TEXTURE_2D,0,gl.RGBA,0,0,canvas.width,canvas.height,0);
 
         // DRAW
         gl.bufferData(gl.ARRAY_BUFFER, this.vertices, gl.STATIC_DRAW);
         gl.drawArrays(gl.TRIANGLES, 0, 6);
 
-        // DELETE TEXTURE (OTHERWISE THE GPU GETS ITS MEMORY FULL)
-//        gl.deleteTexture(tex);
     }
 };
 
@@ -59,15 +45,6 @@ class Framebuffer {
     constructor() {
         this.vertices = vertices;
         this.framebuffer = gl.createFramebuffer();
-        this.framebuffer.texture = gl.createTexture();
-        gl.bindTexture(gl.TEXTURE_2D, this.framebuffer.texture);
-        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, canvas.width, canvas.height, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-    }
-    resize(){
         this.framebuffer.texture = gl.createTexture();
         gl.bindTexture(gl.TEXTURE_2D, this.framebuffer.texture);
         gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, canvas.width, canvas.height, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
