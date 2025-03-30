@@ -358,6 +358,19 @@ void main() {
     if(!ruleFound){
         if(all(equalEnough(color, WATERL))){color = WATERR;ruleFound = true;}
         else if(all(equalEnough(color, WATERR))){color = WATERL;ruleFound = true;}
+        else if(all(equalEnough(color, AIR))){
+            //if below cell has fire, then produce smoke
+            if(cellPosition == 2 && u_step == 0){
+                if(all(equalEnough(cell0Color, FIRE))){
+                    color = MIST;
+                }
+            }
+            else if(cellPosition == 3 && u_step == 1){
+                if(all(equalEnough(cell1Color, FIRE))){
+                    color = MIST;
+                }
+            }
+        }
     }
 
 
